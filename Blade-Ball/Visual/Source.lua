@@ -600,7 +600,7 @@ local function loadExternalLib(url)
     return lib
 end
 
-local externalLib = loadExternalLib("https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/Visual/UI.lua")
+local externalLib = loadExternalLib("https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Visual/UI.lua")
 local mainLib = externalLib.__init()
 
 -- CREATE TABS
