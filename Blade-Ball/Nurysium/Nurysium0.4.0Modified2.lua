@@ -37,7 +37,7 @@ local RunService = game:GetService('RunService')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local TweenService = game:GetService('TweenService')
 
-local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/Nurysium/helper0.3.0.lua'))()
+local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Nurysium/helper0.3.0.lua'))()
 
 local local_player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
