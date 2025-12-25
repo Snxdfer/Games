@@ -21,8 +21,8 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local crypter = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/Nurysium/LastBrokenNurysium_SHA2.lua'), true))()
-local notify = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/Nurysium/LastBrokenNurysium_NotifyUI.lua'))()
+local crypter = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Nurysium/LastBrokenNurysium_SHA2.lua'), true))()
+local notify = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Nurysium/LastBrokenNurysium_NotifyUI.lua'))()
 
 notify.__init({
 	parent = cloneref(game:GetService('CoreGui'))
@@ -44,7 +44,7 @@ local names_map = {
 	['Soi'] = crypter.sha3_384(client_id .. 'Soi', 'sha3-256')
 }
 
-local interface = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/Nurysium/LastBrokenNurysium_UI.lua'))()
+local interface = loadstring(game:HttpGet('https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Nurysium/LastBrokenNurysium_UI.lua'))()
 
 local assets = game:GetObjects('rbxassetid://98657300657778')[1]
 
