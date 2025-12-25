@@ -1,0 +1,1316 @@
+repeat task.wait() until game:IsLoaded()
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local GuiService = game:GetService("GuiService")
+
+-- Main Gui Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BladeBallScript"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+-- Mobile Icon Button (for mobile users)
+local MobileIcon = Instance.new("TextButton")
+MobileIcon.Name = "MobileIcon"
+MobileIcon.Size = UDim2.new(0, 50, 0, 50)
+MobileIcon.Position = UDim2.new(0, 10, 0.5, -25)
+MobileIcon.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+MobileIcon.Text = "⚙️"
+MobileIcon.TextSize = 24
+MobileIcon.Font = Enum.Font.GothamBold
+MobileIcon.Visible = false  -- Hidden by default, shown only on mobile
+MobileIcon.AutoButtonColor = false
+MobileIcon.Parent = ScreenGui
+
+local MobileIconCorner = Instance.new("UICorner", MobileIcon)
+MobileIconCorner.CornerRadius = UDim.new(0, 12)
+
+-- Check if user is on mobile
+local function isMobile()
+    return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+end
+
+-- Mobile icon hover effects
+MobileIcon.MouseEnter:Connect(function()
+    if not isMobile() then
+        TweenService:Create(MobileIcon, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(150, 100, 220)}):Play()
+    end
+end)
+
+MobileIcon.MouseLeave:Connect(function()
+    if not isMobile() then
+        TweenService:Create(MobileIcon, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(120, 80, 200)}):Play()
+    end
+end)
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 350, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -100)
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = false  -- Hidden by default, press K to toggle
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 8)
+
+-- Top Bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 50)
+TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = MainFrame
+
+local TopCorner = Instance.new("UICorner", TopBar)
+TopCorner.CornerRadius = UDim.new(0, 8)
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0, 200, 0, 25)
+Title.Position = UDim2.new(0, 10, 0, 5)
+Title.BackgroundTransparency = 1
+Title.Text = "BladeBall Script"
+Title.TextColor3 = Color3.fromRGB(180, 100, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+-- Subtitle
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Size = UDim2.new(0, 200, 0, 18)
+Subtitle.Position = UDim2.new(0, 10, 0, 28)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "by darkiee"
+Subtitle.TextColor3 = Color3.fromRGB(150, 100, 200)
+Subtitle.TextSize = 13
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+Subtitle.Parent = TopBar
+
+-- Discord Button
+local DiscordButton = Instance.new("TextButton")
+DiscordButton.Size = UDim2.new(0, 80, 0, 28)
+DiscordButton.Position = UDim2.new(1, -210, 0.5, -14)
+DiscordButton.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+DiscordButton.Text = "Discord"
+DiscordButton.TextColor3 = Color3.new(1, 1, 1)
+DiscordButton.TextSize = 13
+DiscordButton.Font = Enum.Font.GothamBold
+DiscordButton.AutoButtonColor = false
+DiscordButton.Parent = TopBar
+
+local DiscordCorner = Instance.new("UICorner", DiscordButton)
+DiscordCorner.CornerRadius = UDim.new(0, 6)
+
+DiscordButton.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/rxnnY4uRQT")
+    warn("Discord link copied to clipboard!")
+end)
+
+-- YouTube Button
+local YoutubeButton = Instance.new("TextButton")
+YoutubeButton.Size = UDim2.new(0, 80, 0, 28)
+YoutubeButton.Position = UDim2.new(1, -125, 0.5, -14)
+YoutubeButton.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+YoutubeButton.Text = "YouTube"
+YoutubeButton.TextColor3 = Color3.new(1, 1, 1)
+YoutubeButton.TextSize = 13
+YoutubeButton.Font = Enum.Font.GothamBold
+YoutubeButton.AutoButtonColor = false
+YoutubeButton.Parent = TopBar
+
+local YoutubeCorner = Instance.new("UICorner", YoutubeButton)
+YoutubeCorner.CornerRadius = UDim.new(0, 6)
+
+-- Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 10)
+CloseButton.BackgroundTransparency = 1
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(200, 100, 200)
+CloseButton.TextSize = 18
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = TopBar
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    if isMobile() then
+        MobileIcon.Visible = true
+    end
+end)
+
+-- Sidebar
+local SideBarHolder = Instance.new("ScrollingFrame")
+SideBarHolder.Position = UDim2.new(0, 5, 0, 55)
+SideBarHolder.Size = UDim2.new(0, 100, 1, -60)
+SideBarHolder.BackgroundTransparency = 1
+SideBarHolder.ScrollBarThickness = 2
+SideBarHolder.BorderSizePixel = 0
+SideBarHolder.ScrollBarImageColor3 = Color3.fromRGB(180, 100, 255)
+SideBarHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
+SideBarHolder.Parent = MainFrame
+
+local SideLayout = Instance.new("UIListLayout", SideBarHolder)
+SideLayout.Padding = UDim.new(0, 6)
+SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Content Area
+local ContentArea = Instance.new("Frame")
+ContentArea.Position = UDim2.new(0, 110, 0, 55)
+ContentArea.Size = UDim2.new(1, -115, 1, -60)
+ContentArea.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ContentArea.BorderSizePixel = 0
+ContentArea.Parent = MainFrame
+
+local ContentCorner = Instance.new("UICorner", ContentArea)
+ContentCorner.CornerRadius = UDim.new(0, 6)
+
+local pages = {}
+local activeTab = nil
+local selectedFieldButton = nil
+
+-- Create Page Function
+local function CreatePage(name, features)
+    local pageFrame = Instance.new("ScrollingFrame")
+    pageFrame.Size = UDim2.new(1, -8, 1, -8)
+    pageFrame.Position = UDim2.new(0, 4, 0, 4)
+    pageFrame.BackgroundTransparency = 1
+    pageFrame.Visible = false
+    pageFrame.ScrollBarThickness = 2
+    pageFrame.BorderSizePixel = 0
+    pageFrame.ScrollBarImageColor3 = Color3.fromRGB(180, 100, 255)
+    pageFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    pageFrame.Parent = ContentArea
+    
+    local layout = Instance.new("UIListLayout", pageFrame)
+    layout.Padding = UDim.new(0, 8)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    for _, feature in pairs(features) do
+        local featBtn = Instance.new("TextButton")
+        featBtn.Size = UDim2.new(1, -10, 0, 35)
+        featBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        featBtn.TextColor3 = Color3.fromRGB(220, 180, 255)
+        featBtn.Text = feature.name
+        featBtn.TextSize = 14
+        featBtn.TextXAlignment = Enum.TextXAlignment.Left
+        featBtn.Font = Enum.Font.Gotham
+        featBtn.AutoButtonColor = false
+        featBtn.Parent = pageFrame
+        
+        local btnCorner = Instance.new("UICorner", featBtn)
+        btnCorner.CornerRadius = UDim.new(0, 6)
+        
+        featBtn.MouseEnter:Connect(function()
+            if selectedFieldButton ~= featBtn then
+                TweenService:Create(featBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 60, 180)}):Play()
+            end
+        end)
+        featBtn.MouseLeave:Connect(function()
+            if selectedFieldButton ~= featBtn then
+                TweenService:Create(featBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+            end
+        end)
+        
+        featBtn.MouseButton1Click:Connect(feature.callback)
+    end
+    
+    pages[name] = pageFrame
+end
+
+-- Create Sidebar Tab
+local function CreateTab(name)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 90, 0, 32)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    btn.TextColor3 = Color3.fromRGB(200, 150, 255)
+    btn.Text = name
+    btn.TextSize = 13
+    btn.Font = Enum.Font.GothamMedium
+    btn.AutoButtonColor = false
+    btn.Parent = SideBarHolder
+    
+    local tabCorner = Instance.new("UICorner", btn)
+    tabCorner.CornerRadius = UDim.new(0, 6)
+    
+    btn.MouseEnter:Connect(function()
+        if activeTab ~= btn then
+            TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 100, 255)}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = Color3.new(1, 1, 1)}):Play()
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if activeTab ~= btn then
+            TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(200, 150, 255)}):Play()
+        end
+    end)
+
+    btn.MouseButton1Click:Connect(function()
+        if activeTab then
+            TweenService:Create(activeTab, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+            TweenService:Create(activeTab, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(200, 150, 255)}):Play()
+        end
+        
+        activeTab = btn
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(120, 70, 200)}):Play()
+        TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = Color3.new(1, 1, 1)}):Play()
+        
+        for _, p in pairs(pages) do p.Visible = false end
+        if pages[name] then pages[name].Visible = true end
+    end)
+end
+
+-- BladeBall Game Variables
+local Vector2_Mouse_Location = nil
+local Grab_Parry = nil
+local Aerodynamic = false
+local Aerodynamic_Time = tick()
+local Last_Input = UserInputService:GetLastInputType()
+
+local revertedRemotes = {}
+local originalMetatables = {}
+
+local Visualization = {
+    Enabled = true,
+    Ring = nil,
+    BallESP = {},
+    PlayerESP = {},
+    Lines = {},
+    Colors = {
+        Ring = Color3.fromRGB(0, 170, 255),
+        BallLabel = Color3.fromRGB(255, 50, 50),
+        PlayerLabel = Color3.fromRGB(50, 200, 50),
+        Line = Color3.fromRGB(255, 255, 0),
+        SpeedText = Color3.fromRGB(0, 255, 0),
+        AbilityText = Color3.fromRGB(255, 165, 0)
+    },
+    Transparency = 0.3,
+    BaseSize = 15,
+    MaxRingSize = 50,
+    MinRingSize = 10
+}
+
+local Parries = 0
+local Auto_Parry = {}
+Auto_Parry.Parry_Type = "Random"
+
+local Connections_Manager = {}
+local Parried = false
+local FirstParryDone = false
+
+-- Visualization Functions
+function Visualization:CreateRing()
+    if self.Ring then
+        self.Ring:Destroy()
+        self.Ring = nil
+    end
+    
+    local ring = Instance.new("Part")
+    ring.Name = "ParryRangeRing"
+    ring.Shape = Enum.PartType.Cylinder
+    ring.Material = Enum.Material.Neon
+    ring.Color = self.Colors.Ring
+    ring.Transparency = self.Transparency
+    ring.CanCollide = false
+    ring.Anchored = true
+    ring.CanQuery = false
+    ring.CastShadow = false
+    ring.Locked = true
+    
+    ring.Size = Vector3.new(0.2, self.BaseSize, self.BaseSize)
+    
+    local pointLight = Instance.new("PointLight")
+    pointLight.Brightness = 0.3
+    pointLight.Range = self.BaseSize * 1.5
+    pointLight.Color = self.Colors.Ring
+    pointLight.Parent = ring
+    
+    local speedGui = Instance.new("BillboardGui")
+    speedGui.Name = "SpeedDisplay"
+    speedGui.Size = UDim2.new(0, 150, 0, 60)
+    speedGui.StudsOffset = Vector3.new(0, 3.5, 0)
+    speedGui.AlwaysOnTop = true
+    speedGui.Enabled = true
+    speedGui.MaxDistance = 100
+    speedGui.Adornee = ring
+    
+    local speedText = Instance.new("TextLabel")
+    speedText.Name = "SpeedText"
+    speedText.Size = UDim2.new(1, 0, 1, 0)
+    speedText.BackgroundTransparency = 1
+    speedText.TextColor3 = self.Colors.SpeedText
+    speedText.TextStrokeTransparency = 0.5
+    speedText.TextStrokeColor3 = Color3.new(0, 0, 0)
+    speedText.Font = Enum.Font.SourceSansBold
+    speedText.TextSize = 18
+    speedText.Text = "Speed: 0"
+    speedText.Parent = speedGui
+    
+    speedGui.Parent = ring
+    
+    self.Ring = ring
+    return ring
+end
+
+function Visualization:UpdateRing(character, ballDistance, ballSpeed)
+    if not self.Enabled or not character or not character.PrimaryPart then
+        if self.Ring then
+            self.Ring:Destroy()
+            self.Ring = nil
+        end
+        return
+    end
+    
+    if not self.Ring then
+        self:CreateRing()
+    end
+    
+    local ring = self.Ring
+    local primaryPart = character.PrimaryPart
+    
+    ring.Position = primaryPart.Position + Vector3.new(0, 0.5, 0)
+    ring.CFrame = CFrame.new(ring.Position) * CFrame.Angles(0, 0, math.rad(90))
+    
+    local targetSize = self.BaseSize
+    if ballDistance and ballDistance < 100 then
+        targetSize = math.clamp(ballDistance / 2, self.MinRingSize, self.MaxRingSize)
+    end
+    
+    local currentSize = ring.Size.Y
+    local newSize = currentSize + (targetSize - currentSize) * 0.1
+    ring.Size = Vector3.new(0.2, newSize, newSize)
+    
+    if ring:FindFirstChildOfClass("PointLight") then
+        ring:FindFirstChildOfClass("PointLight").Range = newSize * 1.5
+    end
+    
+    if ballSpeed and ring:FindFirstChild("SpeedDisplay") then
+        local speedText = ring.SpeedDisplay.SpeedText
+        speedText.Text = string.format("Speed: %.0f", ballSpeed)
+        
+        if ballSpeed > 200 then
+            speedText.TextColor3 = Color3.fromRGB(255, 0, 0)
+        elseif ballSpeed > 100 then
+            speedText.TextColor3 = Color3.fromRGB(255, 165, 0)
+        else
+            speedText.TextColor3 = self.Colors.SpeedText
+        end
+    end
+    
+    if not ring.Parent then
+        ring.Parent = workspace
+    end
+end
+
+function Visualization:CreateBallESP(ball)
+    if not ball or not self.Enabled then return end
+    
+    local ballId = tostring(ball)
+    
+    if self.BallESP[ballId] then
+        self:RemoveBallESP(ballId)
+    end
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "BallESP"
+    billboard.Size = UDim2.new(0, 200, 0, 80)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Enabled = true
+    billboard.Adornee = ball
+    billboard.MaxDistance = 300
+    
+    local mainLabel = Instance.new("TextLabel")
+    mainLabel.Name = "MainLabel"
+    mainLabel.Size = UDim2.new(1, 0, 1, 0)
+    mainLabel.Position = UDim2.new(0, 0, 0, 0)
+    mainLabel.BackgroundTransparency = 1
+    mainLabel.TextColor3 = self.Colors.BallLabel
+    mainLabel.TextStrokeTransparency = 0.5
+    mainLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    mainLabel.Font = Enum.Font.SourceSansBold
+    mainLabel.TextSize = 20
+    mainLabel.Text = "BALL"
+    mainLabel.Parent = billboard
+    
+    billboard.Parent = ball
+    
+    self.BallESP[ballId] = {
+        Billboard = billboard,
+        Ball = ball
+    }
+    
+    return billboard
+end
+
+function Visualization:UpdateBallESP(ballId, targetName, distance)
+    if not self.BallESP[ballId] then return end
+    
+    local esp = self.BallESP[ballId]
+    if esp.Billboard and esp.Billboard:FindFirstChild("MainLabel") then
+        local displayText = "BALL"
+        
+        if targetName then
+            if targetName == Player.Name then
+                esp.Billboard.MainLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+                displayText = "BALL [TARGETING YOU]"
+            else
+                esp.Billboard.MainLabel.TextColor3 = self.Colors.BallLabel
+                displayText = "BALL [Target: " .. targetName .. "]"
+            end
+        end
+        
+        if distance then
+            displayText = displayText .. string.format(" (%.1f)", distance)
+        end
+        
+        esp.Billboard.MainLabel.Text = displayText
+    end
+end
+
+function Visualization:RemoveBallESP(ballId)
+    if self.BallESP[ballId] then
+        if self.BallESP[ballId].Billboard then
+            self.BallESP[ballId].Billboard:Destroy()
+        end
+        self.BallESP[ballId] = nil
+    end
+end
+
+function Visualization:GetPlayerAbility(player)
+    if not player or not player.Character then
+        return "No Sword"
+    end
+    
+    local character = player.Character
+    
+    local currentSword = character:GetAttribute('CurrentlyEquippedSword')
+    if currentSword then
+        return currentSword
+    end
+    
+    if character:FindFirstChild("AbilityIndicator") then
+        return "Has Ability"
+    end
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            if part.Transparency < 1 and part.Material == Enum.Material.Neon then
+                return "Special"
+            end
+        end
+    end
+    
+    return "No Sword"
+end
+
+function Visualization:CreatePlayerESP(player)
+    if not player or player == Player or not self.Enabled then return end
+    
+    local playerId = tostring(player.UserId)
+    
+    if self.PlayerESP[playerId] then
+        self:RemovePlayerESP(playerId)
+    end
+    
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "PlayerESP"
+    billboard.Size = UDim2.new(0, 200, 0, 100)
+    billboard.StudsOffset = Vector3.new(0, 5, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Enabled = true
+    billboard.Adornee = player.Character.HumanoidRootPart
+    billboard.MaxDistance = 200
+    
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Name = "NameLabel"
+    nameLabel.Size = UDim2.new(1, 0, 0.4, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.TextColor3 = self.Colors.PlayerLabel
+    nameLabel.TextStrokeTransparency = 0.5
+    nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    nameLabel.Font = Enum.Font.SourceSansBold
+    nameLabel.TextSize = 18
+    nameLabel.Text = player.Name
+    nameLabel.Parent = billboard
+    
+    local abilityLabel = Instance.new("TextLabel")
+    abilityLabel.Name = "AbilityLabel"
+    abilityLabel.Size = UDim2.new(1, 0, 0.4, 0)
+    abilityLabel.Position = UDim2.new(0, 0, 0.4, 0)
+    abilityLabel.BackgroundTransparency = 1
+    abilityLabel.TextColor3 = self.Colors.AbilityText
+    abilityLabel.TextStrokeTransparency = 0.5
+    abilityLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    abilityLabel.Font = Enum.Font.SourceSans
+    abilityLabel.TextSize = 16
+    abilityLabel.Text = "Sword: Checking..."
+    abilityLabel.Parent = billboard
+    
+    local healthLabel = Instance.new("TextLabel")
+    healthLabel.Name = "HealthLabel"
+    healthLabel.Size = UDim2.new(1, 0, 0.4, 0)
+    healthLabel.Position = UDim2.new(0, 0, 0.8, 0)
+    healthLabel.BackgroundTransparency = 1
+    healthLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    healthLabel.TextStrokeTransparency = 0.5
+    healthLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    healthLabel.Font = Enum.Font.SourceSans
+    healthLabel.TextSize = 14
+    healthLabel.Text = "Health: 100"
+    healthLabel.Parent = billboard
+    
+    billboard.Parent = player.Character.HumanoidRootPart
+    
+    self.PlayerESP[playerId] = {
+        Billboard = billboard,
+        Player = player
+    }
+    
+    return billboard
+end
+
+function Visualization:UpdatePlayerESP(playerId)
+    if not self.PlayerESP[playerId] then return end
+    
+    local esp = self.PlayerESP[playerId]
+    local player = esp.Player
+    
+    if not player or not player.Character or not player.Character:FindFirstChild("Humanoid") then
+        self:RemovePlayerESP(playerId)
+        return
+    end
+    
+    if esp.Billboard and esp.Billboard:FindFirstChild("AbilityLabel") then
+        local ability = self:GetPlayerAbility(player)
+        esp.Billboard.AbilityLabel.Text = "Sword: " .. ability
+        
+        local humanoid = player.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            esp.Billboard.HealthLabel.Text = string.format("Health: %d/%d", humanoid.Health, humanoid.MaxHealth)
+            
+            local healthPercent = humanoid.Health / humanoid.MaxHealth
+            if healthPercent > 0.7 then
+                esp.Billboard.HealthLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+            elseif healthPercent > 0.3 then
+                esp.Billboard.HealthLabel.TextColor3 = Color3.fromRGB(255, 165, 0)
+            else
+                esp.Billboard.HealthLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+            end
+        end
+    end
+end
+
+function Visualization:RemovePlayerESP(playerId)
+    if self.PlayerESP[playerId] then
+        if self.PlayerESP[playerId].Billboard then
+            self.PlayerESP[playerId].Billboard:Destroy()
+        end
+        self.PlayerESP[playerId] = nil
+    end
+end
+
+function Visualization:CreateLine(from, to, ballId)
+    if not from or not to then return end
+    
+    if self.Lines[ballId] then
+        self:RemoveLine(ballId)
+    end
+    
+    local line = Instance.new("Beam")
+    line.Name = "BallConnectionLine"
+    line.Color = ColorSequence.new(self.Colors.Line)
+    line.Width0 = 0.15
+    line.Width1 = 0.15
+    line.Transparency = NumberSequence.new(0.6)
+    line.LightEmission = 0.5
+    line.LightInfluence = 0
+    line.FaceCamera = true
+    
+    local attachment0 = Instance.new("Attachment")
+    attachment0.Name = "PlayerAttachment"
+    attachment0.Parent = from
+    
+    local attachment1 = Instance.new("Attachment")
+    attachment1.Name = "BallAttachment"
+    attachment1.Parent = to
+    
+    line.Attachment0 = attachment0
+    line.Attachment1 = attachment1
+    line.Parent = workspace
+    
+    self.Lines[ballId] = {
+        Beam = line,
+        Attachments = {attachment0, attachment1},
+        From = from,
+        To = to
+    }
+    
+    return line
+end
+
+function Visualization:RemoveLine(ballId)
+    if self.Lines[ballId] then
+        if self.Lines[ballId].Beam then
+            self.Lines[ballId].Beam:Destroy()
+        end
+        if self.Lines[ballId].Attachments then
+            for _, attachment in ipairs(self.Lines[ballId].Attachments) do
+                if attachment and attachment.Parent then
+                    attachment:Destroy()
+                end
+            end
+        end
+        self.Lines[ballId] = nil
+    end
+end
+
+function Visualization:Cleanup()
+    if self.Ring then
+        self.Ring:Destroy()
+        self.Ring = nil
+    end
+    
+    for ballId, _ in pairs(self.BallESP) do
+        self:RemoveBallESP(ballId)
+    end
+    self.BallESP = {}
+    
+    for playerId, _ in pairs(self.PlayerESP) do
+        self:RemovePlayerESP(playerId)
+    end
+    self.PlayerESP = {}
+    
+    for ballId, _ in pairs(self.Lines) do
+        self:RemoveLine(ballId)
+    end
+    self.Lines = {}
+end
+
+function Visualization:Toggle()
+    self.Enabled = not self.Enabled
+    if not self.Enabled then
+        self:Cleanup()
+    end
+    return self.Enabled
+end
+
+-- Auto Parry Functions
+function Auto_Parry.Parry_Animation()
+    local Parry_Animation = game:GetService("ReplicatedStorage").Shared.SwordAPI.Collection.Default:FindFirstChild('GrabParry')
+    local Current_Sword = Player.Character:GetAttribute('CurrentlyEquippedSword')
+    if not Current_Sword then return end
+    if not Parry_Animation then return end
+    local Sword_Data = game:GetService("ReplicatedStorage").Shared.ReplicatedInstances.Swords.GetSword:Invoke(Current_Sword)
+    if not Sword_Data or not Sword_Data['AnimationType'] then return end
+    for _, object in pairs(game:GetService('ReplicatedStorage').Shared.SwordAPI.Collection:GetChildren()) do
+        if object.Name == Sword_Data['AnimationType'] then
+            if object:FindFirstChild('GrabParry') or object:FindFirstChild('Grab') then
+                local sword_animation_type = object:FindFirstChild('GrabParry') and 'GrabParry' or 'Grab'
+                Parry_Animation = object[sword_animation_type]
+            end
+        end
+    end
+    if Player.Character and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid:FindFirstChild("Animator") then
+        Grab_Parry = Player.Character.Humanoid.Animator:LoadAnimation(Parry_Animation)
+        Grab_Parry:Play()
+    end
+end
+
+function Auto_Parry.Get_Balls()
+    local Balls = {}
+    for _, Instance in pairs(workspace.Balls:GetChildren()) do
+        if Instance:GetAttribute('realBall') then
+            Instance.CanCollide = false
+            table.insert(Balls, Instance)
+        end
+    end
+    return Balls
+end
+
+function Auto_Parry.Get_Ball()
+    for _, Instance in pairs(workspace.Balls:GetChildren()) do
+        if Instance:GetAttribute('realBall') then
+            Instance.CanCollide = false
+            return Instance
+        end
+    end
+end
+
+function Auto_Parry.Parry_Data()
+    local Camera = workspace.CurrentCamera
+    if not Camera then return {0, CFrame.new(), {}, {0, 0}} end
+    if Last_Input == Enum.UserInputType.MouseButton1 or Last_Input == Enum.UserInputType.MouseButton2 or Last_Input == Enum.UserInputType.Keyboard then
+        Vector2_Mouse_Location = {UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y}
+    else
+        Vector2_Mouse_Location = {Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2}
+    end
+    local directionMap = {
+        ['Backwards'] = function()
+            return CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position - (Camera.CFrame.LookVector * 1000))
+        end,
+        ['Random'] = function()
+            return CFrame.new(Camera.CFrame.Position, Vector3.new(math.random(-3000, 3000), math.random(-3000, 3000), math.random(-3000, 3000)))
+        end,
+        ['Camera'] = function()
+            return Camera.CFrame
+        end
+    }
+    return {0, directionMap[Auto_Parry.Parry_Type] and directionMap[Auto_Parry.Parry_Type]() or Camera.CFrame, {}, Vector2_Mouse_Location}
+end
+
+function Auto_Parry.Get_Ball_Speed(ball)
+    if not ball then return 0 end
+    local Zoomies = ball:FindFirstChild('zoomies')
+    if not Zoomies then return 0 end
+    return Zoomies.VectorVelocity.Magnitude
+end
+
+function Auto_Parry.Get_Ball_Distance(ball)
+    if not ball or not Player.Character or not Player.Character.PrimaryPart then
+        return math.huge
+    end
+    return (Player.Character.PrimaryPart.Position - ball.Position).Magnitude
+end
+
+function Auto_Parry.Parry()
+    local Parry_Data = Auto_Parry.Parry_Data()
+    if not FirstParryDone then
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0.001)
+        task.wait(0.1)
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0.001)
+        FirstParryDone = true
+    else
+        for remote, originalArgs in pairs(revertedRemotes) do
+            local modifiedArgs = {
+                originalArgs[1],
+                originalArgs[2],
+                originalArgs[3],
+                Parry_Data[2],
+                originalArgs[5],
+                originalArgs[6],
+                originalArgs[7]
+            }
+            if remote:IsA("RemoteEvent") then
+                remote:FireServer(unpack(modifiedArgs))
+            elseif remote:IsA("RemoteFunction") then
+                remote:InvokeServer(unpack(modifiedArgs))
+            end
+        end
+    end
+    if Parries > 7 then return false end
+    Parries += 1
+    task.delay(0.5, function()
+        if Parries > 0 then Parries -= 1 end
+    end)
+end
+
+local Lerp_Radians = 0
+local Last_Warping = tick()
+function Auto_Parry.Linear_Interpolation(a, b, time_volume)
+    return a + (b - a) * time_volume
+end
+local Previous_Velocity = {}
+local Curving = tick()
+function Auto_Parry.Is_Curved()
+    local Ball = Auto_Parry.Get_Ball()
+    if not Ball then return false end
+    local Zoomies = Ball:FindFirstChild('zoomies')
+    if not Zoomies then return false end
+    local Ping = game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()
+    local Velocity = Zoomies.VectorVelocity
+    local Ball_Direction = Velocity.Unit
+    local Direction = (Player.Character.PrimaryPart.Position - Ball.Position).Unit
+    local Dot = Direction:Dot(Ball_Direction)
+    local Speed = Velocity.Magnitude
+    local Speed_Threshold = math.min(Speed / 100, 40)
+    local Angle_Threshold = 40 * math.max(Dot, 0)
+    local Direction_Difference = (Ball_Direction - Velocity).Unit
+    local Direction_Similarity = Direction:Dot(Direction_Difference)
+    local Dot_Difference = Dot - Direction_Similarity
+    local Dot_Threshold = 0.5 - Ping / 1000
+    local Distance = (Player.Character.PrimaryPart.Position - Ball.Position).Magnitude
+    local Reach_Time = Distance / Speed - (Ping / 1000)
+    local Enough_Speed = Speed > 100
+    local Ball_Distance_Threshold = 15 - math.min(Distance / 1000, 15) + Angle_Threshold + Speed_Threshold
+    table.insert(Previous_Velocity, Velocity)
+    if #Previous_Velocity > 4 then table.remove(Previous_Velocity, 1) end
+    if Enough_Speed and Reach_Time > Ping / 10 then
+        Ball_Distance_Threshold = math.max(Ball_Distance_Threshold - 15, 15)
+    end
+    if Distance < Ball_Distance_Threshold then return false end
+    if (tick() - Curving) < Reach_Time / 1.5 then return true end
+    if Dot_Difference < Dot_Threshold then return true end
+    local Radians = math.rad(math.asin(Dot))
+    Lerp_Radians = Auto_Parry.Linear_Interpolation(Lerp_Radians, Radians, 0.8)
+    if Lerp_Radians < 0.018 then Last_Warping = tick() end
+    if (tick() - Last_Warping) < (Reach_Time / 1.5) then return true end
+    if #Previous_Velocity == 4 then
+        local Intended_Direction_Difference = (Ball_Direction - Previous_Velocity[1].Unit).Unit
+        local Intended_Dot = Direction:Dot(Intended_Direction_Difference)
+        local Intended_Dot_Difference = Dot - Intended_Dot
+        local Intended_Direction_Difference2 = (Ball_Direction - Previous_Velocity[2].Unit).Unit
+        local Intended_Dot2 = Direction:Dot(Intended_Direction_Difference2)
+        local Intended_Dot_Difference2 = Dot - Intended_Dot2
+        if Intended_Dot_Difference < Dot_Threshold or Intended_Dot_Difference2 < Dot_Threshold then return true end
+    end
+    if (tick() - Last_Warping) < (Reach_Time / 1.5) then return true end
+    return Dot < Dot_Threshold
+end
+
+local function isValidRemoteArgs(args)
+    return #args == 7 and
+           type(args[2]) == "string" and
+           type(args[3]) == "number" and
+           typeof(args[4]) == "CFrame" and
+           type(args[5]) == "table" and
+           type(args[6]) == "table" and
+           type(args[7]) == "boolean"
+end
+
+local function hookRemote(remote)
+    if not revertedRemotes[remote] then
+        local meta = getrawmetatable(remote)
+        if not originalMetatables[meta] then
+            originalMetatables[meta] = true
+            setreadonly(meta, false)
+            local oldIndex = meta.__index
+            meta.__index = function(self, key)
+                if key == "FireServer" and self:IsA("RemoteEvent") then
+                    return function(_, ...)
+                        local args = { ... }
+                        if isValidRemoteArgs(args) and not revertedRemotes[self] then
+                            revertedRemotes[self] = args
+                        end
+                        return oldIndex(self, "FireServer")(_, table.unpack(args))
+                    end
+                elseif key == "InvokeServer" and self:IsA("RemoteFunction") then
+                    return function(_, ...)
+                        local args = { ... }
+                        if isValidRemoteArgs(args) and not revertedRemotes[self] then
+                            revertedRemotes[self] = args
+                        end
+                        return oldIndex(self, "InvokeServer")(_, table.unpack(args))
+                    end
+                end
+                return oldIndex(self, key)
+            end
+            setreadonly(meta, true)
+        end
+    end
+end
+
+for _, remote in pairs(game.ReplicatedStorage:GetChildren()) do
+    if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
+        hookRemote(remote)
+    end
+end
+game.ReplicatedStorage.ChildAdded:Connect(function(child)
+    if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+        hookRemote(child)
+    end
+end)
+
+local function runAutoParry()
+    Connections_Manager['Auto Parry'] = RunService.RenderStepped:Connect(function()
+        local Balls = Auto_Parry.Get_Balls()
+        
+        local closestBall = nil
+        local closestDistance = math.huge
+        local ballSpeed = 0
+        
+        for _, ball in pairs(Balls) do
+            if ball and ball:IsA("BasePart") then
+                local ballId = tostring(ball)
+                local distance = Auto_Parry.Get_Ball_Distance(ball)
+                
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestBall = ball
+                    ballSpeed = Auto_Parry.Get_Ball_Speed(ball)
+                end
+                
+                if Visualization.Enabled then
+                    if not Visualization.BallESP[ballId] then
+                        Visualization:CreateBallESP(ball)
+                    end
+                    
+                    local target = ball:GetAttribute('target')
+                    Visualization:UpdateBallESP(ballId, target, distance)
+                    
+                    if Player.Character and Player.Character.PrimaryPart then
+                        Visualization:CreateLine(Player.Character.PrimaryPart, ball, ballId)
+                    end
+                end
+            end
+        end
+        
+        if Visualization.Enabled then
+            local currentBallIds = {}
+            for _, ball in pairs(Balls) do
+                if ball then
+                    table.insert(currentBallIds, tostring(ball))
+                end
+            end
+            
+            for ballId, _ in pairs(Visualization.BallESP) do
+                if not table.find(currentBallIds, ballId) then
+                    Visualization:RemoveBallESP(ballId)
+                end
+            end
+            
+            for ballId, _ in pairs(Visualization.Lines) do
+                if not table.find(currentBallIds, ballId) then
+                    Visualization:RemoveLine(ballId)
+                end
+            end
+        end
+        
+        if Player.Character and Player.Character.PrimaryPart and Visualization.Enabled then
+            Visualization:UpdateRing(Player.Character, closestDistance, ballSpeed)
+        end
+        
+        if Visualization.Enabled then
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= Player then
+                    local playerId = tostring(player.UserId)
+                    
+                    if not Visualization.PlayerESP[playerId] then
+                        Visualization:CreatePlayerESP(player)
+                    else
+                        Visualization:UpdatePlayerESP(playerId)
+                    end
+                end
+            end
+            
+            for playerId, _ in pairs(Visualization.PlayerESP) do
+                local playerStillExists = false
+                for _, player in pairs(Players:GetPlayers()) do
+                    if tostring(player.UserId) == playerId then
+                        playerStillExists = true
+                        break
+                    end
+                end
+                
+                if not playerStillExists then
+                    Visualization:RemovePlayerESP(playerId)
+                end
+            end
+        end
+        
+        local One_Ball = Auto_Parry.Get_Ball()
+        for _, Ball in pairs(Balls) do
+            if not Ball then
+                repeat task.wait() Balls = Auto_Parry.Get_Balls() until Balls
+                return
+            end
+            local Zoomies = Ball:FindFirstChild('zoomies')
+            if not Zoomies then return end
+            Ball:GetAttributeChangedSignal('target'):Once(function() Parried = false end)
+            if Parried then return end
+            local Ball_Target = Ball:GetAttribute('target')
+            local One_Target = One_Ball:GetAttribute('target')
+            local Velocity = Zoomies.VectorVelocity
+            local Distance = (Player.Character.PrimaryPart.Position - Ball.Position).Magnitude
+            local Speed = Velocity.Magnitude
+            local Ping = game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue() / 10
+            local Parry_Accuracy_Calc = (Speed / 3.25) + Ping
+            local Curved = Auto_Parry.Is_Curved()
+            if Ball_Target == tostring(Player) and Aerodynamic then
+                local Elasped_Tornado = tick() - Aerodynamic_Time
+                if Elasped_Tornado > 0.6 then
+                    Aerodynamic_Time = tick()
+                    Aerodynamic = false
+                end
+                return
+            end
+            if One_Target == tostring(Player) and Curved then return end
+            if Ball_Target == tostring(Player) and Distance <= Parry_Accuracy_Calc then
+                Auto_Parry.Parry()
+                Parried = true
+                Auto_Parry.Parry_Animation()
+            end
+            local Last_Parrys = tick()
+            repeat RunService.RenderStepped:Wait() until (tick() - Last_Parrys) >= 1 or not Parried
+            Parried = false
+        end
+    end)
+end
+
+local function runAutoSpam()
+    Connections_Manager['Auto Spam'] = RunService.PreSimulation:Connect(function()
+        local Ball = Auto_Parry.Get_Ball()
+        if not Ball then return end
+        local Zoomies = Ball:FindFirstChild('zoomies')
+        if not Zoomies then return end
+        local Closest_Entity = nil
+        local Max_Distance = math.huge
+        for _, Entity in pairs(workspace.Alive:GetChildren()) do
+            if tostring(Entity) ~= tostring(Player) then
+                local Distance = Player:DistanceFromCharacter(Entity.PrimaryPart.Position)
+                if Distance < Max_Distance then
+                    Max_Distance = Distance
+                    Closest_Entity = Entity
+                end
+            end
+        end
+        if not Closest_Entity then return end
+        local Ping = game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()
+        local Ping_Threshold = math.clamp(Ping / 10, 10, 16)
+        local Velocity = Ball.AssemblyLinearVelocity
+        local Speed = Velocity.Magnitude
+        local Direction = (Player.Character.PrimaryPart.Position - Ball.Position).Unit
+        local Dot = Direction:Dot(Velocity.Unit)
+        local Target_Position = Closest_Entity.PrimaryPart.Position
+        local Target_Distance = Player:DistanceFromCharacter(Target_Position)
+        local Ball_Distance = Player:DistanceFromCharacter(Ball.Position)
+        local Maximum_Spam_Distance = Ping_Threshold + math.min(Speed / 6.5, 95)
+        local Entity_Distance = (Player.Character.PrimaryPart.Position - Closest_Entity.PrimaryPart.Position).Magnitude
+        if Entity_Distance > Maximum_Spam_Distance then return end
+        if Ball_Distance > Maximum_Spam_Distance then return end
+        if Target_Distance > Maximum_Spam_Distance then return end
+        local Maximum_Speed = 5 - math.min(Speed / 5, 5)
+        local Maximum_Dot = math.clamp(Dot, -1, 0) * Maximum_Speed
+        local Spam_Accuracy = Maximum_Spam_Distance - Maximum_Dot
+        local Ball_Target = workspace.Alive:FindFirstChild(Ball:GetAttribute('target'))
+        if not Ball_Target then return end
+        if Target_Distance > Spam_Accuracy or Ball_Distance > Spam_Accuracy then return end
+        if Ball_Distance <= Spam_Accuracy and Parries > 1 then
+            Auto_Parry.Parry()
+            Auto_Parry.Parry_Animation()
+        end
+    end)
+end
+
+local function cleanupConnections()
+    for _, connection in pairs(Connections_Manager) do
+        if connection then connection:Disconnect() end
+    end
+    Connections_Manager = {}
+    Parried = false
+    FirstParryDone = false
+    Parries = 0
+    Aerodynamic = false
+    
+    Visualization:Cleanup()
+end
+
+local function startScript()
+    cleanupConnections()
+    runAutoParry()
+    runAutoSpam()
+end
+
+local function stopScript()
+    cleanupConnections()
+end
+
+-- GUI Features
+local autoParryFeatures = {
+    {name = "Start Auto Parry", callback = function()
+        startScript()
+        warn("[BladeBall Script] Auto Parry STARTED")
+    end},
+    {name = "Stop Auto Parry", callback = function()
+        stopScript()
+        warn("[BladeBall Script] Auto Parry STOPPED")
+    end},
+}
+
+local visualizationFeatures = {
+    {name = "Toggle Visualizations", callback = function()
+        local enabled = Visualization:Toggle()
+        if enabled then
+            warn("[BladeBall Script] All Visualizations ENABLED")
+        else
+            warn("[BladeBall Script] All Visualizations DISABLED")
+        end
+    end},
+    {name = "Toggle ESP Lines", callback = function()
+        for ballId, lineInfo in pairs(Visualization.Lines) do
+            if lineInfo and lineInfo.Beam then
+                lineInfo.Beam.Enabled = not lineInfo.Beam.Enabled
+            end
+        end
+        warn("[BladeBall Script] Connection lines toggled")
+    end},
+    {name = "Toggle Player ESP", callback = function()
+        for playerId, espInfo in pairs(Visualization.PlayerESP) do
+            if espInfo and espInfo.Billboard then
+                espInfo.Billboard.Enabled = not espInfo.Billboard.Enabled
+            end
+        end
+        warn("[BladeBall Script] Player ESP toggled")
+    end},
+}
+
+local settingsFeatures = {
+    {name = "Parry Type: Random", callback = function()
+        Auto_Parry.Parry_Type = "Random"
+        warn("[BladeBall Script] Parry type set to: Random")
+    end},
+    {name = "Parry Type: Camera", callback = function()
+        Auto_Parry.Parry_Type = "Camera"
+        warn("[BladeBall Script] Parry type set to: Camera")
+    end},
+    {name = "Parry Type: Backwards", callback = function()
+        Auto_Parry.Parry_Type = "Backwards"
+        warn("[BladeBall Script] Parry type set to: Backwards")
+    end},
+}
+
+-- Create pages and tabs
+CreatePage("Auto Parry", autoParryFeatures)
+CreatePage("Visualization", visualizationFeatures)
+CreatePage("Settings", settingsFeatures)
+
+CreateTab("Auto Parry")
+CreateTab("Visualization")
+CreateTab("Settings")
+
+-- Default tab
+if pages["Auto Parry"] then
+    pages["Auto Parry"].Visible = true
+    for _, tab in pairs(SideBarHolder:GetChildren()) do
+        if tab:IsA("TextButton") and tab.Text == "Auto Parry" then
+            activeTab = tab
+            tab.BackgroundColor3 = Color3.fromRGB(120, 70, 200)
+            tab.TextColor3 = Color3.new(1, 1, 1)
+            break
+        end
+    end
+end
+
+-- Mobile icon click handler
+MobileIcon.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+    if MainFrame.Visible then
+        MobileIcon.Visible = false
+    end
+end)
+
+-- Toggle GUI with K key (for PC)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.K then
+        MainFrame.Visible = not MainFrame.Visible
+        if isMobile() then
+            MobileIcon.Visible = not MainFrame.Visible
+        end
+    end
+end)
+
+-- Function to check device and show/hide mobile icon
+local function checkDevice()
+    if isMobile() then
+        MobileIcon.Visible = true
+        print("[BladeBall Script] Mobile device detected. Use the ⚙️ icon to open menu.")
+    else
+        MobileIcon.Visible = false
+        print("[BladeBall Script] PC device detected. Press K to open menu.")
+    end
+end
+
+-- Check device type on startup and when screen size changes
+checkDevice()
+GuiService:GetPropertyChangedSignal("ScreenOrientation"):Connect(checkDevice)
+
+-- Adjust mobile icon position for different screen orientations
+local function updateMobileIconPosition()
+    if isMobile() then
+        local screenSize = workspace.CurrentCamera.ViewportSize
+        if screenSize.Y > screenSize.X then -- Portrait
+            MobileIcon.Position = UDim2.new(0, 10, 0.5, -25)
+        else -- Landscape
+            MobileIcon.Position = UDim2.new(0, 10, 0, 10)
+        end
+    end
+end
+
+-- Update position when screen changes
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updateMobileIconPosition)
+updateMobileIconPosition()
+
+-- Game Event Connections
+Player.CharacterAdded:Connect(function(character)
+    task.wait(1)
+    startScript()
+end)
+
+Player.CharacterRemoving:Connect(function()
+    cleanupConnections()
+end)
+
+workspace.Runtime.ChildAdded:Connect(function(Value)
+    if Value.Name == 'Tornado' then
+        Aerodynamic_Time = tick()
+        Aerodynamic = true
+    end
+end)
+
+workspace.Balls.ChildAdded:Connect(function(ball)
+    Parried = false
+    if Visualization.Enabled and ball:GetAttribute('realBall') then
+        task.wait(0.1)
+        Visualization:CreateBallESP(ball)
+    end
+end)
+
+workspace.Balls.ChildRemoved:Connect(function(ball)
+    Parries = 0
+    Parried = false
+    if ball then
+        local ballId = tostring(ball)
+        Visualization:RemoveBallESP(ballId)
+        Visualization:RemoveLine(ballId)
+    end
+end)
+
+Players.PlayerAdded:Connect(function(player)
+    if Visualization.Enabled then
+        task.wait(1)
+        Visualization:CreatePlayerESP(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    local playerId = tostring(player.UserId)
+    Visualization:RemovePlayerESP(playerId)
+end)
+
+ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(_, root)
+    if root.Parent and root.Parent ~= Player.Character and root.Parent.Parent == workspace.Alive then
+        local Ball = Auto_Parry.Get_Ball()
+        if Ball and Grab_Parry then
+            Grab_Parry:Stop()
+        end
+    end
+end)
+
+ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
+    if Player.Character.Parent == workspace.Alive and Grab_Parry then
+        Grab_Parry:Stop()
+    end
+end)
+
+-- Start the script
+startScript()
+
+print("BladeBall Script by darkiee - Loaded!")
