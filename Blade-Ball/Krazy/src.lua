@@ -87,7 +87,7 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
-local KrazyApiFsploit = "https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/RandomSources/Krazy/RevAPI.lua" 
+local KrazyApiFsploit = "https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Krazy/RevAPI.lua" 
 
 if KrazyApiFsploit == nil or KrazyApiFsploit == "" then
     game:GetService("Players").LocalPlayer:Kick("Frostware Api: Api not found")
@@ -1600,7 +1600,7 @@ end)
 
 local HttpService = game:GetService("HttpService")
 
-local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Snxdfer/BladeBall-Scripts/refs/heads/main/RandomSources/Krazy/ModernLib.lua"))()
+local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Snxdfer/Games/refs/heads/main/Blade-Ball/Krazy/ModernLib.lua"))()
 
 local Win = Lib:CreateWindow({
     Name = "Krazy Hub",
