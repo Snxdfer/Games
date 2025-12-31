@@ -51,7 +51,7 @@ local LoadCharacter = function(v)
 	if not t.Adornee then
 		return UnloadCharacter(v)
 	end
-	t.Tag.Text = v.Name
+	t.Tag.Text = v.DisplayName
 	b.Color3 = Color3.new(v.TeamColor.r, v.TeamColor.g, v.TeamColor.b)
 	t.Tag.TextColor3 = Color3.new(v.TeamColor.r, v.TeamColor.g, v.TeamColor.b)
 	local Update
@@ -66,6 +66,9 @@ local LoadCharacter = function(v)
 	end
 	UpdateNameTag()
 	Update = v.Character.Humanoid.Changed:Connect(UpdateNameTag)
+	local DisplayUpdate = v:GetPropertyChangedSignal("DisplayName"):Connect(function()
+		t.Tag.Text = v.DisplayName
+	end)
 end
 
 local UnloadCharacter = function(v)
@@ -141,10 +144,11 @@ function esp(target, color)
     end
 end
 
-while task.wait() do
+while true do
     for i, v in pairs(players:GetPlayers()) do
         if v ~= plr then
             esp(v, _G.UseTeamColor and v.TeamColor.Color or ((plr.TeamColor == v.TeamColor) and _G.FriendColor or _G.EnemyColor))
         end
     end
+    task.wait(1)
 end
